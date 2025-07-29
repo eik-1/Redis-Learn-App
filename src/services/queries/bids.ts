@@ -1,11 +1,32 @@
-import { bidHistoryKey } from '$services/keys';
+import { bidHistoryKey, itemsKey } from '$services/keys';
 import { client } from '$services/redis';
 import type { CreateBidAttrs, Bid } from '$services/types';
+import { getItem } from './items';
 import { DateTime } from 'luxon';
 
 export const createBid = async (attrs: CreateBidAttrs) => {
+	const item = await getItem(attrs.itemId);
+
+	if (!item) {
+		throw new Error('Item not found');
+	}
+	if (item.price >= attrs.amount) {
+		throw new Error('Bid too low');
+	}
+	if (item.endingAt.diff(DateTime.now()).toMillis() < 0) {
+		throw new Error('Item closed to bidding');
+	}
+
 	const serialized = serializeHistory(attrs.amount, attrs.createdAt.toMillis());
-	return client.rPush(bidHistoryKey(attrs.itemId), serialized);
+
+	return Promise.all([
+		client.rPush(bidHistoryKey(attrs.itemId), serialized),
+		client.hSet(itemsKey(item.id), {
+			bids: item.bids + 1,
+			price: attrs.amount,
+			highestBidUserId: attrs.userId
+		})
+	]);
 };
 
 export const getBidHistory = async (itemId: string, offset = 0, count = 10): Promise<Bid[]> => {
@@ -13,7 +34,7 @@ export const getBidHistory = async (itemId: string, offset = 0, count = 10): Pro
 	const endIndex = -1 - offset;
 
 	const range = await client.lRange(bidHistoryKey(itemId), startIndex, endIndex);
-	return range.map((bid) => deserializeHistory(bid)  	);
+	return range.map((bid) => deserializeHistory(bid));
 };
 
 const serializeHistory = (amount: number, createdAt: number) => {
