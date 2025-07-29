@@ -1,12 +1,10 @@
 import { sessionsKey } from '$services/keys';
 import { client } from '$services/redis';
 import type { Session } from '$services/types';
-import { genId } from '$services/utils';
 
 export const getSession = async (id: string) => {
 	const session = await client.hGetAll(sessionsKey(id));
 	if (Object.keys(session).length === 0) return null;
-	console.log(session);
 	return deserialize(id, session);
 };
 

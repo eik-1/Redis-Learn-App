@@ -10,9 +10,9 @@ export const sessionsKey = (sessionId: string) => {
 	return `sessions#${sessionId}`;
 };
 
-export const usernameUniqueKey = () => `username:unique`;
+export const usernameUniqueKey = () => `username:unique`; // set for checking if username is unique
 
-export const usernamesKey = () => 'usernames';
+export const usernamesKey = () => 'usernames'; // sorted set for checking user id by username
 
 export const userLikesKey = (userId: string) => {
 	return `users:likes#${userId}`;
@@ -21,11 +21,12 @@ export const userLikesKey = (userId: string) => {
 // Items
 export const itemsKey = (itemId: string) => {
 	return `items#${itemId}`;
-};
+}; // hash for item details
 export const itemsByViewsKey = () => {
-	return `items:views`;
+	return `items:views`; // sorted set for items sorted by views
 };
-export const itemsByEndingAtKey = () => 'items:endingAt';
-export const itemsViewsKey = (itemId: string) => `items:views#${itemId}`;
+export const itemsByEndingAtKey = () => 'items:endingAt'; // sorted set for items sorted by ending time
+export const itemsViewsKey = (itemId: string) => `items:views#${itemId}`; // hyperloglog for items views (unique views)
 
-// Users
+// Bids
+export const bidHistoryKey = (itemId: string) => `history#${itemId}`; // list for bid history

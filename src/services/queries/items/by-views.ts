@@ -12,7 +12,7 @@ export const itemsByViews = async (order: 'DESC' | 'ASC' = 'DESC', offset = 0, c
 			`${itemsKey('*')}->imageUrl`,
 			`${itemsKey('*')}->price`
 		],
-		BY: 'score',
+		BY: 'nosort',
 		DIRECTION: order,
 		LIMIT: {
 			offset,
