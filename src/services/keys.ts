@@ -25,6 +25,9 @@ export const itemsKey = (itemId: string) => {
 export const itemsByViewsKey = () => {
 	return `items:views`; // sorted set for items sorted by views
 };
+export const itemsByPriceKey = () => {
+	return `items:price`; // sorted set for items sorted by price
+};
 export const itemsByEndingAtKey = () => 'items:endingAt'; // sorted set for items sorted by ending time
 export const itemsViewsKey = (itemId: string) => `items:views#${itemId}`; // hyperloglog for items views (unique views)
 
